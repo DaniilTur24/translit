@@ -109,7 +109,7 @@ check("Ekaterina", "Екатерина")
 check("delat", "делат", fixes: false)
 
 // Dictionary repair: a tiny fake dictionary stands in for the macOS one
-let fakeDictionary: Set<String> = ["советовать", "только", "это", "эхо", "красивый", "привет", "как", "дела", "тест", "площад", "весь", "вес", "ответ", "ответь"]
+let fakeDictionary: Set<String> = ["советовать", "только", "это", "эхо", "красивый", "привет", "как", "дела", "тест", "площад", "весь", "вес", "ответ", "ответь", "дней", "идеи", "идей"]
 let fakeCompletions = ["площад": ["площадь", "площадка"], "вес": ["весь", "вес"], "ответ": ["ответь", "ответы", "ответ"], "тест": ["тест", "тестовый"]]
 let fakeLexicon = Fixes.Lexicon(isWord: { fakeDictionary.contains($0) }, completions: { fakeCompletions[$0] ?? [] })
 func checkDict(_ input: String, _ expected: String, line: Int = #line) {
@@ -126,6 +126,8 @@ checkDict("eho", "эхо")
 checkDict("ploshchad", "площадь")          // the dictionary accepts площад, but its top completion is площадь
 checkDict("ves", "вес")                   // вес lists itself among the completions: stays вес, not весь
 checkDict("otvet", "ответ")               // same for ответ, not ответь
+checkDict("dnei", "дней")                 // unknown word ending in и: try й
+checkDict("idei", "идеи")                 // already a real word: stays
 checkDict("test", "тест")                 // completions start with the word itself: unchanged
 checkDict("privet kak dela", "привет как дела")   // valid words stay as they are
 checkDict("xyzzy", "ксыззы")            // nothing fits: plain transliteration stays

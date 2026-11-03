@@ -42,7 +42,7 @@ enum Fixes {
     ///    очен -> очень, пят -> пять (the dictionary accepts both, but nobody completes to the typo).
     ///    Real words such as ответ (-> ответь) or вес (-> весь) list themselves, so they stay.
     /// 2. The dictionary does not know the word: try small edits (ь at the end or inside, э instead of е,
-    ///    ий <-> ый) and keep the first real word.
+    ///    ий <-> ый, final и -> й) and keep the first real word.
     /// Returns `word` unchanged when it is fine or nothing fits (names, slang, unknown words).
     static func repair(_ word: String, lexicon: Lexicon) -> String {
         guard word.count >= 3 else { return word }
@@ -55,6 +55,7 @@ enum Fixes {
         if c[0] == "е" { candidates.append("э" + String(c.dropFirst())) }
         if word.hasSuffix("ий") { candidates.append(String(c.dropLast(2)) + "ый") }
         if word.hasSuffix("ый") { candidates.append(String(c.dropLast(2)) + "ий") }
+        if word.hasSuffix("и") { candidates.append(String(c.dropLast()) + "й") }   // днеи -> дней, дорогои -> дорогой
         for i in stride(from: c.count - 1, to: 0, by: -1) where !"аеёиоуыэюяьъ".contains(c[i - 1]) {
             candidates.append(String(c[..<i]) + "ь" + String(c[i...]))   // толко -> только
         }
