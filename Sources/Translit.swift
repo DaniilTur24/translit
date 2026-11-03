@@ -7,20 +7,23 @@ import Foundation
 enum Translit {
     /// Converts every Latin word in `text`; whitespace, punctuation, digits,
     /// Cyrillic, URLs, e-mails and camelCase words are left untouched.
-    static func convert(_ text: String, smartFixes: Bool = true) -> String {
+    ///
+    /// `lexicon` is an optional Russian dictionary. When given, words that the rules leave
+    /// misspelled get one more repair attempt (see `Fixes.repair`).
+    static func convert(_ text: String, smartFixes: Bool = true, lexicon: Fixes.Lexicon? = nil) -> String {
         var result = ""
         var state = State()
         var chunk = ""
         for ch in text {
             if ch.isWhitespace {
-                result += convertChunk(chunk, &state, smartFixes)
+                result += convertChunk(chunk, &state, smartFixes, lexicon)
                 chunk = ""
                 result.append(ch)
             } else {
                 chunk.append(ch)
             }
         }
-        result += convertChunk(chunk, &state, smartFixes)
+        result += convertChunk(chunk, &state, smartFixes, lexicon)
         return result
     }
 
@@ -31,7 +34,7 @@ enum Translit {
         var openQuote = false   // a ' opened a quote and is still waiting for its closing '
     }
 
-    private static func convertChunk(_ chunk: String, _ state: inout State, _ smartFixes: Bool) -> String {
+    private static func convertChunk(_ chunk: String, _ state: inout State, _ smartFixes: Bool, _ lexicon: Fixes.Lexicon?) -> String {
         if chunk.isEmpty { return "" }
         if shouldLeaveAlone(chunk) {
             state.previousWord = ""
@@ -65,7 +68,7 @@ enum Translit {
                 break scan
             }
             let run = String(c[i..<j])
-            out += convertRun(run, state.previousWord, smartFixes)
+            out += convertRun(run, state.previousWord, smartFixes, lexicon)
             state.previousWord = String(run.lowercased().filter(isLatin))
             i = j
         }
@@ -88,7 +91,7 @@ enum Translit {
         return false
     }
 
-    private static func convertRun(_ run: String, _ previousWord: String, _ smartFixes: Bool) -> String {
+    private static func convertRun(_ run: String, _ previousWord: String, _ smartFixes: Bool, _ lexicon: Fixes.Lexicon?) -> String {
         let letters = run.filter(isLatin)
         let pattern: CasePattern
         if letters == letters.lowercased() { pattern = .lower }
@@ -98,7 +101,10 @@ enum Translit {
 
         let lower = Array(run.lowercased().map { isApostrophe($0) ? "'" : $0 })
         var word = transliterate(lower, afterInfinitiveTrigger: infinitiveTriggers.contains(previousWord))
-        if smartFixes { word = Fixes.apply(word) }
+        if smartFixes {
+            word = Fixes.apply(word)
+            if let lexicon { word = Fixes.repair(word, lexicon: lexicon) }
+        }
         switch pattern {
         case .lower: return word
         case .title: return word.prefix(1).uppercased() + word.dropFirst()

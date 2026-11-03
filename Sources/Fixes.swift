@@ -30,6 +30,37 @@ enum Fixes {
         return w
     }
 
+    /// A Russian word source. `isWord` says whether a lowercase word is real; `completions` lists
+    /// likely completions of a word, most likely first (the macOS dictionary ranks by frequency).
+    struct Lexicon {
+        let isWord: (String) -> Bool
+        var completions: (String) -> [String] = { _ in [] }
+    }
+
+    /// Last resort for a word the rules left alone, using a Russian dictionary.
+    /// 1. The most likely completion is the word plus ь and the word itself is not among the completions:
+    ///    очен -> очень, пят -> пять (the dictionary accepts both, but nobody completes to the typo).
+    ///    Real words such as ответ (-> ответь) or вес (-> весь) list themselves, so they stay.
+    /// 2. The dictionary does not know the word: try small edits (ь at the end or inside, э instead of е,
+    ///    ий <-> ый) and keep the first real word.
+    /// Returns `word` unchanged when it is fine or nothing fits (names, slang, unknown words).
+    static func repair(_ word: String, lexicon: Lexicon) -> String {
+        guard word.count >= 3 else { return word }
+        let completions = lexicon.completions(word)
+        if completions.first == word + "ь", !completions.contains(word) { return word + "ь" }
+        let isWord = lexicon.isWord
+        guard !isWord(word) else { return word }
+        let c = Array(word)
+        var candidates = [word + "ь"]
+        if c[0] == "е" { candidates.append("э" + String(c.dropFirst())) }
+        if word.hasSuffix("ий") { candidates.append(String(c.dropLast(2)) + "ый") }
+        if word.hasSuffix("ый") { candidates.append(String(c.dropLast(2)) + "ий") }
+        for i in stride(from: c.count - 1, to: 0, by: -1) where !"аеёиоуыэюяьъ".contains(c[i - 1]) {
+            candidates.append(String(c[..<i]) + "ь" + String(c[i...]))   // толко -> только
+        }
+        return candidates.first(where: isWord) ?? word
+    }
+
     /// Endings that are (almost) never valid without a soft sign.
     private static let softSuffixes = ["дцат", "ност", "ател", "ител", "ыват", "иват", "ироват", "юс"]
 
@@ -62,7 +93,7 @@ enum Fixes {
         "пользовател": "пользователь",
         // soft sign inside
         "толко": "только", "сколко": "сколько", "несколко": "несколько", "болше": "больше", "болшой": "большой",
-        "денги": "деньги", "друзя": "друзья", "статя": "статья",
+        "денги": "деньги", "друзя": "друзья", "статя": "статья", "очен": "очень",
         // numbers
         "пят": "пять", "шест": "шесть", "сем": "семь", "восем": "восемь", "девят": "девять", "десят": "десять",
         "пятдесят": "пятьдесят", "шестдесят": "шестьдесят", "семдесят": "семьдесят", "восемдесят": "восемьдесят",
