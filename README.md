@@ -19,7 +19,7 @@ mozhesh mne pomoch             → можешь мне помочь
 xcode-select --install
 
 # 2. Скачать проект и установить
-git clone <URL-репозитория> translit
+git clone https://github.com/DaniilTur24/translit.git
 cd translit
 ./test.sh        # необязательно: прогнать тесты конвертера
 ./install.sh     # собрать, поставить в ~/Applications, включить автозапуск
