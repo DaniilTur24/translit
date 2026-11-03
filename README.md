@@ -1,5 +1,7 @@
 # Translit
 
+**English:** a tiny offline hotkey tool that turns Russian typed in Latin letters into Cyrillic, in place. Select `privet kak dela`, press **Control + Option + R** (macOS) or **Ctrl + Alt + R** (Windows), get `привет как дела`. No internet, no AI, no accounts, nothing is logged. macOS: Swift, install with `./install.sh` (see below). Windows: AutoHotkey v2, see [windows/](windows/README.md). MIT licensed. The rest of this README is in Russian.
+
 Маленькая утилита для macOS: выделяете русский текст, набранный латиницей, жмёте **Control + Option + R** — и он заменяется кириллицей на месте.
 
 ```
@@ -94,3 +96,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.translit.plist    
 | `Sources/main.swift` | хоткей, запуск и подключение словаря macOS |
 
 Режим «privet␣ → привет␣» понадобится добавить отдельным файлом: `CGEventTap` на пробел, который выделяет предыдущее слово (Option+Shift+←) и вызывает уже готовый `SelectionReplacer.run { Translit.convert($0) }`. Конвертер и замена менять не придётся.
+
+## Лицензия
+
+[MIT](LICENSE). Можно свободно использовать, менять и распространять.
