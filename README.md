@@ -12,7 +12,7 @@ mozhesh mne pomoch             → можешь мне помочь
 
 ## Установка на новом Mac
 
-Нужна macOS 12 или новее (Intel и Apple Silicon подходят). Только macOS: утилита использует её API.
+Нужна macOS 12 или новее (Intel и Apple Silicon подходят). Эта версия только для macOS. Версия для Windows (AutoHotkey, без системного словаря) лежит в папке [windows/](windows/README.md).
 
 ```bash
 # 1. Инструменты сборки от Apple (бесплатно, ~1 ГБ). Если `swiftc --version` уже работает, пропустите.
