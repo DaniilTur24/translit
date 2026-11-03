@@ -2,6 +2,16 @@
 
 **English:** a tiny offline hotkey tool that turns Russian typed in Latin letters into Cyrillic, in place. Select `privet kak dela`, press **Control + Option + R** (macOS) or **Ctrl + Alt + R** (Windows), get `привет как дела`. No internet, no AI, no accounts, nothing is logged. macOS: Swift, install with `./install.sh` (see below). Windows: AutoHotkey v2, see [windows/](windows/README.md). MIT licensed. The rest of this README is in Russian.
 
+## Установка с помощью ИИ (самый простой способ)
+
+Откройте **Claude Code** или **Codex** и вставьте это:
+
+> Склонируй репозиторий https://github.com/DaniilTur24/translit, прочитай AGENTS.md и помоги мне установить Translit на этот компьютер. Объясняй каждый шаг по-русски и спрашивай моё разрешение, прежде чем что-то устанавливать.
+
+*English:* "Clone https://github.com/DaniilTur24/translit, read AGENTS.md and help me install Translit on this computer. Explain each step and ask my permission before installing anything."
+
+Ассистент проверит систему, запустит тесты, установит программу и подскажет, куда нажать для выдачи разрешения. Ручная установка описана ниже.
+
 Маленькая утилита для macOS: выделяете русский текст, набранный латиницей, жмёте **Control + Option + R** — и он заменяется кириллицей на месте.
 
 ```

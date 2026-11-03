@@ -3,6 +3,7 @@
 #Include Fixes.ahk
 
 ; Run: double-click this file (or `AutoHotkey64.exe Tests.ahk`). A message box shows the result.
+; With the argument /quiet there is no window: the result goes to tests-result.txt and the exit code is 0 / 1.
 ; The checks are generated from Tests/main.swift (without the macOS dictionary part).
 
 failed := []
@@ -131,11 +132,18 @@ Check("ya 5 minut", "я 5 минут")
 Check("privet 😀 kak dela", "привет 😀 как дела")
 
 if failed.Length = 0 {
-    MsgBox "OK: " total " checks passed"
+    msg := "OK: " total " checks passed"
 } else {
-    report := ""
+    msg := "FAILED: " failed.Length " of " total "`n`n"
     for line in failed
-        report .= line "`n"
-    MsgBox "FAILED: " failed.Length " of " total "`n`n" report
+        msg .= line "`n"
 }
-ExitApp
+if A_Args.Length > 0 && A_Args[1] = "/quiet" {
+    ; no window: write the result next to this script (used by AI assistants and scripts)
+    resultFile := A_ScriptDir "\tests-result.txt"
+    try FileDelete resultFile
+    FileAppend msg "`n", resultFile, "UTF-8"
+} else {
+    MsgBox msg
+}
+ExitApp(failed.Length > 0 ? 1 : 0)
